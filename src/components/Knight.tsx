@@ -1,6 +1,6 @@
 import React from "react";
 
-function Knight(props: any) {
+function Knight() {
   return <div className="piece">{String.fromCharCode(9816)}</div>;
 }
 

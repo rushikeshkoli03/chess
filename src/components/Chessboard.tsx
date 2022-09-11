@@ -4,21 +4,18 @@ import update from "react-addons-update";
 
 function Chessboard() {
   const [knightPosition, setKnightPosition] = useState({ location: 10 });
-  const [squares, setSquares] = useState<any>([]);
-  const [rows, setRows] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const [squares, setSquares] = useState<ISquare[]>([]);
+  const [rows, setRows] = useState<ISquare[][]>([]);
   const [moveInProgress, setMoveInProgress] = useState(false);
-  const [validMoves, setValidMoves] = useState<any>();
+  const [validMoves, setValidMoves] = useState<number[] | null>();
 
   function initBoard() {
-    const squares: any = [];
-    const rows: any = [];
-    const cols: any = [];
-    const colNames: any = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const squares: ISquare[] = [];
+    const rows: ISquare[][] = [];
+    const colNames: string[] = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
     for (let i = 0; i < 8; i++) {
       rows[i] = [];
-      cols[i] = [];
     }
 
     for (let counter = 0, i = 0; i < 8; i++) {
@@ -32,7 +29,6 @@ function Chessboard() {
         };
         squares[counter] = square;
         rows[i][j] = square;
-        cols[j][i] = square;
         counter++;
       }
     }
@@ -43,7 +39,6 @@ function Chessboard() {
     };
 
     setRows(rows);
-    setColumns(cols);
     setSquares(squares);
   }
 
@@ -51,7 +46,7 @@ function Chessboard() {
     initBoard();
   }, []);
 
-  const completeMove = (index: any) => {
+  const completeMove = (index: number) => {
     console.log(index);
     console.log(knightPosition.location);
     let source = squares[knightPosition.location];
@@ -70,10 +65,10 @@ function Chessboard() {
     setValidMoves(null);
   };
 
-  const handleMove = (index: any) => {
+  const handleMove = (index: number) => {
     const target = squares[index];
     if (moveInProgress) {
-      if (!validMoves.includes(target.index)) {
+      if (!validMoves?.includes(target.index)) {
         cancelMove();
         return; // cancel move
       } else {
@@ -82,7 +77,7 @@ function Chessboard() {
       }
     } else {
       if (!target.piece) return;
-      let validMoves = determineValidMoves(target, squares, rows, columns);
+      let validMoves = determineValidMoves(target, rows);
       console.log(validMoves);
       if (!validMoves.length) {
         return;
@@ -93,13 +88,8 @@ function Chessboard() {
     }
   };
 
-  const determineValidMoves = (
-    start: any,
-    squares: any,
-    rows: any,
-    cols: any
-  ) => {
-    let validMoves: any = [];
+  const determineValidMoves = (start: ISquare, rows: ISquare[][]): number[] => {
+    let validMoves: number[] = [];
     let possibleMoves = [];
 
     if (rows[start.row + 1]) {
@@ -123,7 +113,7 @@ function Chessboard() {
       if (move) addMove(move);
     }
 
-    function addMove(target: any) {
+    function addMove(target: ISquare) {
       validMoves.push(target.index);
     }
 
@@ -132,7 +122,7 @@ function Chessboard() {
 
   return (
     <div className="chessboard">
-      {[...squares].map((square: any, index: any) => {
+      {[...squares].map((square: ISquare, index: number) => {
         return (
           <Block
             key={index}
@@ -149,7 +139,7 @@ function Chessboard() {
             }
             piece={square.piece}
             handleMove={handleMove}
-            isHighlight={moveInProgress && validMoves.includes(index)}
+            isHighlight={moveInProgress && validMoves?.includes(index)}
           />
         );
       })}
@@ -158,3 +148,16 @@ function Chessboard() {
 }
 
 export default Chessboard;
+
+interface ISquare {
+  index: number;
+  chessId: string;
+  row: number;
+  col: number;
+  piece: IPiece | null;
+}
+
+interface IPiece {
+  location: number;
+  type: string;
+}

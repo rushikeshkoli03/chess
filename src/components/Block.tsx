@@ -1,7 +1,7 @@
 import React from "react";
 import Knight from "./Knight";
 
-function Block(props: any) {
+function Block(props: IProps) {
   let { piece, index, blockName, handleMove, color, isHighlight } = props;
   return (
     <div
@@ -19,3 +19,17 @@ function Block(props: any) {
 }
 
 export default Block;
+
+interface IProps {
+  index: number;
+  blockName: string;
+  color: "white" | "black";
+  piece: IPiece | null;
+  handleMove: (arg0: number) => void;
+  isHighlight: boolean | undefined;
+}
+
+interface IPiece {
+  location: number;
+  type: string;
+}
